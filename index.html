@@ -8,15 +8,15 @@
         /* 便签样式：温柔圆角、阴影、固定宽高适配手机 */
         .note {
             position: absolute;
-            width: 280px; /* 手机适配宽度 */
-            height: 60px;
-            border-radius: 12px;
+            width: 150px; /* 手机适配宽度 */
+            height: 40px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: "微软雅黑", sans-serif;
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 300;
             color: #333;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             z-index: 10;
@@ -56,8 +56,8 @@
 
         // 3. 生成手机屏幕上的爱心坐标（适配手机尺寸）
         function generateHeartPoints(numPoints) {
-            const screenW = window.innerWidth - 300; // 预留便签宽度
-            const screenH = window.innerHeight - 100; // 预留便签高度
+            const screenW = window.innerWidth - 500; // 预留便签宽度
+            const screenH = window.innerHeight - 300; // 预留便签高度
             const points = [];
             
             // 笛卡尔心形曲线公式
@@ -115,7 +115,7 @@
             }, 200); // 创建间隔（毫秒）
 
             // 全部创建后，停留8秒自动关闭（可调整）
-            const holdSeconds = 8;
+            const holdSeconds = 20;
             setTimeout(() => {
                 notes.forEach((note, i) => {
                     // 逐个消失，更优雅
