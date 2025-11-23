@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨便签爱心墙</title>
+    <style>
+        /* 便签样式：温柔圆角、阴影、固定宽高适配手机 */
+        .note {
+            position: absolute;
+            width: 280px; /* 手机适配宽度 */
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "微软雅黑", sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        /* 页面背景：淡色底更柔和 */
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+            overflow: hidden; /* 隐藏超出屏幕的内容 */
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 1. 祝福文字列表（和你原代码一致，已去重优化）
+        const tips = [
+            '多喝水哦～', '保持微笑呀', '每天都要元气满满', '记得吃水果', '保持好心情', '好好爱自己',
+            '梦想成真', '期待下一次见面', '天冷了，多穿衣服', '愿所有烦恼都消失', '累了就歇一会儿',
+            '今天也要加油呀', '多晒晒太阳呀', '偶尔奖励自己呀', '慢慢来不着急', '把烦恼放一放',
+            '今天也超棒的', '享受当下呀', '愿好运常伴你', '周末好好休息呀', '小确幸藏在日常里',
+            '好好吃饭好好生活', '累了就听首喜欢的歌', '阳光总会照亮你呀', '偶尔偷懒也没关系',
+            '温柔对待每一天', '平凡日子也闪光呀', '生活值得慢慢期待', '快乐其实很简单呀',
+            '我的宝今天也超可爱呀', '一起变成更棒的人呀', '零食和快乐都给你～', '今天也要开心到冒泡',
+            '愿你被世界温柔以待', '小烦恼快走开～', '你笑起来真的超甜呀', '今天也要元气爆棚呀',
+            '把所有好运都分给你', '你的可爱无人能及', '愿你每天都有小惊喜'
+        ];
+
+        // 2. 背景颜色列表（和你原代码一致，低饱和温柔色）
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender', 'lightyellow', 'plum', 'coral', 'bisque',
+            'aquamarine', 'mistyrose', 'honeydew', 'peachpuff', 'palevioletred', 'mintcream', 'cornflowerblue',
+            'seashell', 'paleturquoise', 'linen', 'wheat', 'thistle', 'lightcyan', 'papayawhip', 'rosybrown',
+            'powderblue', 'blanchedalmond', 'lightcoral'
+        ];
+
+        // 3. 生成手机屏幕上的爱心坐标（适配手机尺寸）
+        function generateHeartPoints(numPoints) {
+            const screenW = window.innerWidth - 300; // 预留便签宽度
+            const screenH = window.innerHeight - 100; // 预留便签高度
+            const points = [];
+            
+            // 笛卡尔心形曲线公式
+            for (let i = 0; i < numPoints; i++) {
+                const t = 2 * Math.PI * i / numPoints;
+                const x0 = 16 * Math.sin(t) ** 3;
+                const y0 = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+                points.push([x0, y0]);
+            }
+
+            // 归一化坐标到手机屏幕
+            const xs = points.map(p => p[0]);
+            const ys = points.map(p => p[1]);
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            
+            return points.map(([x0, y0]) => {
+                // 映射到屏幕范围，翻转Y轴（手机屏幕Y向下）
+                const x = Math.floor((x0 - minX) / (maxX - minX) * screenW) + 20;
+                const y = Math.floor((1 - (y0 - minY) / (maxY - minY)) * screenH) + 20;
+                return [x, y];
+            });
+        }
+
+        // 4. 创建便签元素
+        function createNote(x, y) {
+            const note = document.createElement('div');
+            note.className = 'note';
+            // 随机文字和背景色
+            note.textContent = tips[Math.floor(Math.random() * tips.length)];
+            note.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            // 定位到爱心坐标
+            note.style.left = `${x}px`;
+            note.style.top = `${y}px`;
+            document.body.appendChild(note);
+            return note;
+        }
+
+        // 5. 主程序：生成爱心+创建便签+自动关闭
+        (function() {
+            const numNotes = 60; // 便签数量（手机适配，比原代码少避免拥挤）
+            const heartPoints = generateHeartPoints(numNotes);
+            const notes = [];
+
+            // 逐个创建便签（模拟原代码的延迟效果）
+            let index = 0;
+            const createInterval = setInterval(() => {
+                if (index < heartPoints.length) {
+                    const [x, y] = heartPoints[index];
+                    notes.push(createNote(x, y));
+                    index++;
+                } else {
+                    clearInterval(createInterval);
+                }
+            }, 200); // 创建间隔（毫秒）
+
+            // 全部创建后，停留8秒自动关闭（可调整）
+            const holdSeconds = 8;
+            setTimeout(() => {
+                notes.forEach((note, i) => {
+                    // 逐个消失，更优雅
+                    setTimeout(() => {
+                        note.style.opacity = 0;
+                        setTimeout(() => note.remove(), 300);
+                    }, i * 50);
+                });
+            }, holdSeconds * 1000);
+        })();
+    </script>
+</body>
+</html>
