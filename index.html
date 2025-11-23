@@ -114,11 +114,11 @@
                 // 添加到页面
                 document.body.appendChild(note);
                 
-            }, index * 90); // 每个便签延迟90毫秒出现
+            }, index * 200); // 每个便签延迟90毫秒出现
         });
 
         // 5. 自动关闭功能
-        const holdSeconds = 9; // 显示9秒后开始关闭
+        const holdSeconds = 20; // 显示9秒后开始关闭
         setTimeout(() => {
             const notes = document.querySelectorAll('.note');
             notes.forEach((note, index) => {
