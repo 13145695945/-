@@ -3,42 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>爱心便签 (手机版)</title>
+    <title>温馨便签爱心墙 (手机版)</title>
     <style>
-        /* 页面背景设置为透明，以便看到"桌面"效果 */
         body {
             margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5; /* 设置一个柔和的背景色，模拟桌面 */
-            overflow: hidden; /* 禁止页面滚动 */
+            padding: 0;
+            background-color: #fdfdfd; /* 页面背景色 */
+            overflow: hidden; /* 禁止滚动 */
             height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* 便签样式 */
         .note {
             position: absolute;
-            width: 140px; /* 手机上合适的宽度 */
+            width: 150px; /* 便签宽度 */
             height: auto; /* 高度自动适应内容 */
-            min-height: 40px;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            min-height: 45px;
+            border-radius: 10px; /* 圆角 */
+            padding: 12px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 阴影 */
             font-family: "Microsoft YaHei", "Heiti SC", sans-serif;
-            font-size: 14px;
-            color: #333;
+            font-size: 15px; /* 字体大小 */
+            color: #333; /* 文字颜色 */
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            cursor: move; /* 鼠标指针变为移动样式 */
+            cursor: pointer;
             z-index: 10;
-            transition: transform 0.2s ease-out;
+            opacity: 0; /* 初始透明度为0，用于动画 */
+            transform: scale(0.8); /* 初始缩放，用于动画 */
+            animation: popIn 0.5s forwards; /* 弹出动画 */
         }
 
-        /* 便签被选中时的效果 */
-        .note:active {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        /* 弹出动画 */
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
@@ -69,18 +74,16 @@
     // 3. 生成适配手机屏幕的爱心坐标点
     function generateHeartPoints(numPoints) {
         const points = [];
-        // 将爱心定位在屏幕中心，并根据屏幕尺寸缩放
         const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2.2; // 稍微向上移动一点，视觉上更居中
-        // 缩放因子，确保爱心大小合适
-        const scale = Math.min(window.innerWidth, window.innerHeight) / 5.5;
+        const centerY = window.innerHeight / 2.2;
+        // 动态计算缩放因子，确保爱心在不同尺寸的手机上都合适
+        const scale = Math.min(window.innerWidth, window.innerHeight) / 5.8;
 
         for (let i = 0; i < numPoints; i++) {
             const t = 2 * Math.PI * i / numPoints;
             const x = 16 * Math.pow(Math.sin(t), 3);
             const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
             
-            // 计算最终坐标
             const px = centerX + x * scale;
             const py = centerY - y * scale; // Y轴反转
             
@@ -91,7 +94,7 @@
     
     // 4. 创建并显示所有便签
     function createAndShowNotes() {
-        const numNotes = 35; // 便签数量，手机上不宜过多
+        const numNotes = 70; // 便签数量
         const points = generateHeartPoints(numNotes);
 
         points.forEach((point, index) => {
@@ -104,18 +107,18 @@
                 note.textContent = tips[Math.floor(Math.random() * tips.length)];
                 note.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
                 
-                // 设置便签位置（使其中心点对准计算出的坐标）
+                // 设置便签位置
                 note.style.left = `${point.x - note.offsetWidth / 2}px`;
                 note.style.top = `${point.y - note.offsetHeight / 2}px`;
                 
                 // 添加到页面
                 document.body.appendChild(note);
                 
-            }, index * 120); // 每个便签延迟120毫秒出现
+            }, index * 90); // 每个便签延迟90毫秒出现
         });
 
         // 5. 自动关闭功能
-        const holdSeconds = 12; // 显示12秒后开始关闭
+        const holdSeconds = 9; // 显示9秒后开始关闭
         setTimeout(() => {
             const notes = document.querySelectorAll('.note');
             notes.forEach((note, index) => {
@@ -123,9 +126,8 @@
                 setTimeout(() => {
                     note.style.opacity = '0';
                     note.style.transform = 'scale(0.8)';
-                    // 动画结束后移除元素
                     setTimeout(() => note.remove(), 300);
-                }, index * 40);
+                }, index * 30);
             });
         }, holdSeconds * 1000);
     }
