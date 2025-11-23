@@ -2,37 +2,43 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 关键：确保页面在手机上正确缩放 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>温馨便签爱心墙</title>
+    <title>爱心便签 (手机版)</title>
     <style>
-        /* 页面背景 */
+        /* 页面背景设置为透明，以便看到"桌面"效果 */
         body {
             margin: 0;
-            padding: 0;
-            background-color: #f8f9fa; /* 淡灰色背景，更显温馨 */
-            overflow-x: hidden; /* 防止横向滚动 */
-            height: 100vh; /* 让页面占满屏幕高度 */
+            padding: 20px;
+            background-color: #f0f2f5; /* 设置一个柔和的背景色，模拟桌面 */
+            overflow: hidden; /* 禁止页面滚动 */
+            height: 100vh;
         }
 
         /* 便签样式 */
         .note {
             position: absolute;
-            width: 140px; /* 手机端合适的宽度 */
-            height: 40px; /* 手机端合适的高度 */
-            border-radius: 8px; /* 圆角 */
+            width: 140px; /* 手机上合适的宽度 */
+            height: auto; /* 高度自动适应内容 */
+            min-height: 40px;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            font-family: "Microsoft YaHei", "Heiti SC", sans-serif;
+            font-size: 14px;
+            color: #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: "Microsoft YaHei", sans-serif; /* 微软雅黑 */
-            font-size: 14px; /* 手机端合适的字体大小 */
-            color: #333; /* 文字颜色 */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 轻微阴影 */
-            cursor: default; /* 鼠标指针样式 */
-            z-index: 10;
-            transition: all 0.3s ease-out;
-            padding: 5px 10px; /* 内边距，防止文字太拥挤 */
             text-align: center;
+            cursor: move; /* 鼠标指针变为移动样式 */
+            z-index: 10;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* 便签被选中时的效果 */
+        .note:active {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -59,34 +65,35 @@
         'seashell', 'paleturquoise', 'linen', 'wheat', 'thistle', 'lightcyan', 'papayawhip', 'rosybrown',
         'powderblue', 'blanchedalmond', 'lightcoral'
     ];
-    
-    // 3. 生成爱心坐标点 (适配手机屏幕)
+
+    // 3. 生成适配手机屏幕的爱心坐标点
     function generateHeartPoints(numPoints) {
         const points = [];
-        const centerX = window.innerWidth / 2;  // 屏幕中心X
-        const centerY = window.innerHeight / 2.5; // 屏幕中心Y，略微向上移动
-        const scale = Math.min(window.innerWidth, window.innerHeight) / 5; // 缩放因子，适配屏幕大小
+        // 将爱心定位在屏幕中心，并根据屏幕尺寸缩放
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2.2; // 稍微向上移动一点，视觉上更居中
+        // 缩放因子，确保爱心大小合适
+        const scale = Math.min(window.innerWidth, window.innerHeight) / 5.5;
 
         for (let i = 0; i < numPoints; i++) {
             const t = 2 * Math.PI * i / numPoints;
-            // 笛卡尔心形方程
             const x = 16 * Math.pow(Math.sin(t), 3);
             const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
             
-            // 映射到屏幕坐标
+            // 计算最终坐标
             const px = centerX + x * scale;
-            const py = centerY - y * scale; // Y轴反转，因为屏幕坐标系向下为正
+            const py = centerY - y * scale; // Y轴反转
             
             points.push({x: px, y: py});
         }
         return points;
     }
-
-    // 4. 创建并显示便签
+    
+    // 4. 创建并显示所有便签
     function createAndShowNotes() {
-        const numNotes = 40; // 便签数量
+        const numNotes = 35; // 便签数量，手机上不宜过多
         const points = generateHeartPoints(numNotes);
-        
+
         points.forEach((point, index) => {
             // 延迟创建，营造逐个弹出的效果
             setTimeout(() => {
@@ -97,18 +104,18 @@
                 note.textContent = tips[Math.floor(Math.random() * tips.length)];
                 note.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
                 
-                // 设置位置
+                // 设置便签位置（使其中心点对准计算出的坐标）
                 note.style.left = `${point.x - note.offsetWidth / 2}px`;
                 note.style.top = `${point.y - note.offsetHeight / 2}px`;
                 
                 // 添加到页面
                 document.body.appendChild(note);
                 
-            }, index * 150); // 每个便签延迟150毫秒出现
+            }, index * 120); // 每个便签延迟120毫秒出现
         });
 
         // 5. 自动关闭功能
-        const holdSeconds = 15; // 显示15秒后开始关闭
+        const holdSeconds = 12; // 显示12秒后开始关闭
         setTimeout(() => {
             const notes = document.querySelectorAll('.note');
             notes.forEach((note, index) => {
@@ -118,7 +125,7 @@
                     note.style.transform = 'scale(0.8)';
                     // 动画结束后移除元素
                     setTimeout(() => note.remove(), 300);
-                }, index * 50);
+                }, index * 40);
             });
         }, holdSeconds * 1000);
     }
